@@ -24,12 +24,15 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject fluidTop;
     [SerializeField] private SpriteRenderer fluidBottomRendererRef;
     [SerializeField] private MeterScript meterScriptRef;
+    [SerializeField] private BreadController breadRef;
     [SerializeField] private Color colorRed;
     private Animator fluidAnimatorRef;
     private SpriteRenderer fluidTopRendererRef;
     private float fluidHeight = 0;
     private float fluidExplodeHeight = 2.8f;
     private bool meterExploded = false;
+
+    private bool breadAppearTriggered = false;
 
     public float score = 0f;
 
@@ -39,13 +42,23 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
+        Application.targetFrameRate = 60;
+
         fluidAnimatorRef = fluidTop.GetComponent<Animator>();
         fluidTopRendererRef = fluidTop.GetComponent<SpriteRenderer>();
+    }
 
-        gameStarted = true;
-        if(gameStarted)
+    private void OnApplicationFocus(bool focus)
+    {
+        Cursor.visible = !focus;
+    }
+
+    public void HandClicked()
+    {
+        if (!gameStarted && !breadAppearTriggered)
         {
-            //Cursor.visible = false;
+            breadRef.BreadAppear();
+            breadAppearTriggered = true;
         }
     }
 
@@ -78,11 +91,10 @@ public class GameController : MonoBehaviour
         Color col = Color.Lerp(Color.black, colorRed, score / 3);
         fluidTopRendererRef.color = col;
         fluidBottomRendererRef.color = col;
-        Debug.Log(fluidBottomRendererRef.color);
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            score = 0;
+            Application.Quit();
         }
     }
 }
