@@ -11,10 +11,13 @@ public class BreadController : MonoBehaviour
     [SerializeField] private float appearSpeed = 10;
 
     private bool incoming = false;
+    private Vector2 startPos;
     void Start()
     {
         rendererRef = GetComponent<SpriteRenderer>();
         colliderRef = GetComponent<Collider2D>();
+
+        startPos = transform.position;
     }
 
     public void Update()
@@ -33,7 +36,18 @@ public class BreadController : MonoBehaviour
     public void BreadAppear()
     {
         incoming = true;
-        Debug.Log("appear bread");
+    }
+
+    public void BreadReappear()
+    {
+        if (!rendererRef.enabled)
+        {
+            incoming = true;
+            transform.position = startPos;
+            rendererRef.enabled = true;
+            colliderRef.enabled = true;
+            meterRef.BreadIsHeld(false);
+        }
     }
 
     public void Grabbed()

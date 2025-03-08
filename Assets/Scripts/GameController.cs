@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private SpriteRenderer fluidBottomRendererRef;
     [SerializeField] private MeterScript meterScriptRef;
     [SerializeField] private BreadController breadRef;
+    [SerializeField] private ParticleSystem fallingBreadParticlesRef;
     [SerializeField] private Color colorRed;
     private Animator fluidAnimatorRef;
     private SpriteRenderer fluidTopRendererRef;
@@ -43,6 +44,7 @@ public class GameController : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 60;
+        Cursor.lockState = CursorLockMode.Confined;
 
         fluidAnimatorRef = fluidTop.GetComponent<Animator>();
         fluidTopRendererRef = fluidTop.GetComponent<SpriteRenderer>();
@@ -60,6 +62,10 @@ public class GameController : MonoBehaviour
             breadRef.BreadAppear();
             breadAppearTriggered = true;
         }
+        else
+        {
+            breadRef.BreadReappear();
+        }
     }
 
     void Update()
@@ -74,6 +80,16 @@ public class GameController : MonoBehaviour
         if (score < 0)
         {
             score = 0;
+        }
+
+        ParticleSystem.EmissionModule emission = fallingBreadParticlesRef.emission;
+        if (score > 1)
+        {
+            emission.rateOverTime = score * 3;
+        }
+        else
+        {
+            emission.rateOverTime = 0;
         }
 
         fluidAnimatorRef.speed = 1 + fluidHeight;

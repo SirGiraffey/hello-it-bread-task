@@ -9,7 +9,6 @@ public class HandController : MonoBehaviour
     public float maxHeight = 0.45f;
 
     [SerializeField] private BreadController breadController;
-
     [SerializeField] private int grabState = 0; //0-idle/1-grabempty/2-grabbread
 
     private SpriteRenderer rendererRef;
@@ -20,6 +19,8 @@ public class HandController : MonoBehaviour
 
     private float lastHandSpeed = 0f;
     private Vector2 lastDirection = Vector2.zero;
+
+    private Vector3 lastMousePos;
 
     private bool inFullControl = false;
     private bool isOverBread = false;
@@ -42,6 +43,7 @@ public class HandController : MonoBehaviour
 
         if (inFullControl)
         {
+            mousePosition = new Vector2(Mathf.Clamp(mousePosition.x, -2.5f, 2.5f), Mathf.Max(mousePosition.y, -1.3f));
             transform.position = Vector2.Lerp(transform.position, mousePosition, moveSpeed * Time.deltaTime);
         }
         else
@@ -58,7 +60,12 @@ public class HandController : MonoBehaviour
         {
             float mouseX = Input.GetAxis("Mouse X");
             float mouseY = Input.GetAxis("Mouse Y");
-            handSpeed = Mathf.Abs(mouseX) + Mathf.Abs(mouseY);
+
+            Vector3 mouseDelta = Input.mousePosition - lastMousePos;
+            lastMousePos = Input.mousePosition;
+
+            handSpeed = Mathf.Sqrt(mouseDelta.x * mouseDelta.x + mouseDelta.y * mouseDelta.y) / 30;
+
             GameController.Instance.currentHandSpeed = handSpeed;
 
             Vector2 currentDirection = new Vector2(mouseX, mouseY).normalized;
@@ -101,6 +108,7 @@ public class HandController : MonoBehaviour
             {
                 grabState = 2;
                 breadController.Grabbed();
+                lastMousePos = Input.mousePosition;
             }
             else
             {
